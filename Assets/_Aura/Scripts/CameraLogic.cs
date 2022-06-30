@@ -10,9 +10,16 @@ public class CameraLogic : MonoBehaviour
     [SerializeField] float m_minZ, m_maxZ;
     [SerializeField] float m_lookSensitivity;
     [SerializeField] float m_lookSpeed;
+
+
     //reference to input from touch
     TouchInputController m_TouchInputController;
     //reference to camera target (in this case the player)
+
+    JoystickController m_JoystickController;
+
+    InputManager inputManager;
+
     Vector3 m_cameraTarget;
     //reference to the player Gameobject
     GameObject m_player;
@@ -27,11 +34,16 @@ public class CameraLogic : MonoBehaviour
     private void Awake()
     {
         m_TouchInputController = FindObjectOfType<TouchInputController>();
+        m_JoystickController = FindObjectOfType<JoystickController>();
+        inputManager = GetComponent<InputManager>();
     }
     private void OnEnable()
     {
         //register to listen for touch input
         m_TouchInputController.OnTouchDrag += SetMoveInput;
+        m_JoystickController.OnMoveInput += SetMoveInput;
+        inputManager.OnCameraSpeedSet += SetCameraLookSpeed;
+        
     }
     private void Start()
     {
@@ -65,5 +77,10 @@ public class CameraLogic : MonoBehaviour
     private void SetMoveInput(Vector2 incomingInput)
     {
         m_moveInput = incomingInput;
+    }
+
+    private void SetCameraLookSpeed(float newSpeed)
+    {
+        m_lookSpeed = newSpeed;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,33 +13,40 @@ public class JoystickController : MonoBehaviour, IDragHandler, IPointerUpHandler
     //let interested listeners know
 
     [SerializeField] RectTransform joystickKnobTransform;
-
-    private Vector2 anchoredPosition;
-
-    #region Interface implementations
-
+    [SerializeField] float dragOffsetDistance;
+    [SerializeField] float dragNormalizer;
+    private Vector2 offset;
     private Vector2 startPosition;
+
+    public event Action<Vector2> OnMoveInput;
+
 
     private void Start()
     {
         startPosition = joystickKnobTransform.anchoredPosition;
     }
+
+    #region Interface implementations
     public void OnDrag(PointerEventData eventData)
     {
       //turn joystick anchored position to read from center of transform
       RectTransformUtility.ScreenPointToLocalPointInRectangle(
           joystickKnobTransform,
           eventData.position,
-          null, out anchoredPosition);
+          null, out offset);
 
-        Debug.Log(anchoredPosition);
-        joystickKnobTransform.anchoredPosition = anchoredPosition;
+        offset = Vector2.ClampMagnitude(offset, dragNormalizer) / dragNormalizer;
+        Debug.Log(offset);
+        OnMoveInput?.Invoke(offset);
+        offset = offset * dragOffsetDistance;
+        joystickKnobTransform.anchoredPosition = offset;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        anchoredPosition = startPosition;
-        joystickKnobTransform.anchoredPosition = anchoredPosition;
+        offset = startPosition;
+        joystickKnobTransform.anchoredPosition = offset;
+        OnMoveInput?.Invoke(offset);
     }
 
     public void OnPointerDown(PointerEventData eventData)
