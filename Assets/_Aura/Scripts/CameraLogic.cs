@@ -9,6 +9,7 @@ public class CameraLogic : MonoBehaviour
     [SerializeField] float m_maxLookUp, m_maxLookDown;
     [SerializeField] float m_minZ, m_maxZ;
     [SerializeField] float m_lookSensitivity;
+    [SerializeField] float m_lookSpeed;
     //reference to input from touch
     TouchInputController m_TouchInputController;
     //reference to camera target (in this case the player)
@@ -43,8 +44,8 @@ public class CameraLogic : MonoBehaviour
         m_cameraTarget.y += m_offsetAbove;
 
 
-        m_rotationX += m_moveInput.x * m_lookSensitivity;
-        m_rotationY -= m_moveInput.y * m_lookSensitivity;
+        m_rotationX += m_moveInput.x * m_lookSensitivity* m_lookSpeed;
+        m_rotationY -= m_moveInput.y * m_lookSensitivity * m_lookSpeed;
         m_rotationY = Mathf.Clamp(m_rotationY, m_maxLookUp, m_maxLookDown);
 
     }
