@@ -35,7 +35,7 @@ public class CameraLogic : MonoBehaviour
     {
         m_TouchInputController = FindObjectOfType<TouchInputController>();
         m_JoystickController = FindObjectOfType<JoystickController>();
-        inputManager = GetComponent<InputManager>();
+        inputManager = FindObjectOfType<InputManager>();
     }
     private void OnEnable()
     {

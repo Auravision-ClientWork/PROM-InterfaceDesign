@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
 
 public class TouchInputController : MonoBehaviour
 {
-
+    [SerializeField] LayerMask bodyRegion;
     [field: SerializeField] public Vector2 moveDirection { get; private set; }
 
     [SerializeField] private Vector2 initialTouchPos;
@@ -15,33 +17,55 @@ public class TouchInputController : MonoBehaviour
 
     private void Update()
     {
-     
-        GetTouchPositions();
+        if (EventSystem.current.IsPointerOverGameObject()) return;
 
-        moveDirection =  CalculateMoveDirection(initialTouchPos, dragTouchPos);
+        HandleTouchInput();
 
-        //send moveDirection out to listeners
-        OnTouchDrag?.Invoke(moveDirection);
     }
 
-    private void GetTouchPositions()
+    private void HandleTouchInput()
     {
+        //has user tapped or dragged
         if (Input.GetMouseButtonDown(0))
         {
+            //user has tapped
+            //set the initial touch position
             initialTouchPos = Input.mousePosition;
+            //cast a ray from that position
+            HandleSelection(initialTouchPos);
         }
         else if (Input.GetMouseButton(0))
         {
-            dragTouchPos = Input.mousePosition;
+            //user has dragged
+            HandleDragging();
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            initialTouchPos = Vector2.zero;
-            dragTouchPos = Vector2.zero;
+            OnTouchDrag?.Invoke(Vector2.zero);
         }
-
     }
 
+    private void HandleSelection(Vector2 initialTouchPos)
+    {
+        Ray selectionRay = Camera.main.ScreenPointToRay(initialTouchPos);
+        if(Physics.Raycast(selectionRay,out RaycastHit hitInfo, 100f,bodyRegion))
+        {
+            Debug.Log("We have hit a region!");
+        }
+    }
+
+    private void HandleDragging()
+    {
+        dragTouchPos = Input.mousePosition;
+        moveDirection = CalculateMoveDirection(initialTouchPos, dragTouchPos);
+        OnTouchDrag?.Invoke(moveDirection);
+        
+    }
+
+    private void GetTappedRegion()
+    {
+       
+    }
     private Vector2 CalculateMoveDirection(Vector2 initialTouchPos, Vector2 dragTouchPos)
     {
         Vector2 newMoveDirection = Vector2.zero;
@@ -75,8 +99,8 @@ public class TouchInputController : MonoBehaviour
             absoluteValueOfY = 1;
         }
 
-      //cache this value and return
-      newMoveDirection = new Vector2(absoluteValueOfX, absoluteValueOfY);
-      return newMoveDirection;
+        //cache this value and return
+        newMoveDirection = new Vector2(absoluteValueOfX, absoluteValueOfY);
+        return newMoveDirection;
     }
 }

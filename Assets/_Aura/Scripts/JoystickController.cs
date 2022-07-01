@@ -36,7 +36,7 @@ public class JoystickController : MonoBehaviour, IDragHandler, IPointerUpHandler
           null, out offset);
 
         offset = Vector2.ClampMagnitude(offset, dragNormalizer) / dragNormalizer;
-        Debug.Log(offset);
+      
         OnMoveInput?.Invoke(offset);
         offset = offset * dragOffsetDistance;
         joystickKnobTransform.anchoredPosition = offset;

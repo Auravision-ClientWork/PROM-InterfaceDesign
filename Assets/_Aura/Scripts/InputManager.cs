@@ -90,6 +90,7 @@ public class InputManager : MonoBehaviour
 
     public void SetCameraSpeed(float newVal)
     {
+      
         cameraSpeed = newVal;
         OnCameraSpeedSet?.Invoke(cameraSpeed);
     }
